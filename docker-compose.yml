@@ -1,0 +1,40 @@
+# MariaDB with Adminer
+# Single Node
+# Requires
+# Net mariadb-public
+#
+version: '3.8'
+
+volumes:
+  mdb_data:
+networks:
+  mariadb-public:
+    external: true
+services:
+  mariadb:
+    image: mariadb:10.5.8-focal
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mariadb-root-password
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+          - node.labels.mariadb == 1
+      resources:
+        limits:
+          cpus: '0.99'
+          memory: 900M
+        reservations:
+          cpus: '0.25'
+          memory: 300M
+    volumes:
+      - mdb_data:/var/lib/mysql
+      - "./sda:/home"
+    networks:
+      - mariadb-public
+  panel:
+    image: adminer:4.8.0-standalone
+    networks:
+      - mariadb-public
+
+
