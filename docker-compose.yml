@@ -21,6 +21,8 @@ networks:
 services:
   mariadb:
     image: mariadb:10.5.8-focal
+    secrets:
+      - mariadb-root-password
     environment:
       MYSQL_ROOT_PASSWORD_FILE: /run/secrets/mariadb-root-password
     deploy:
