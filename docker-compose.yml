@@ -2,11 +2,17 @@
 # Single Node
 # Requires
 # Net mariadb-public
-#
+# Secret mariadb-root-password
+# Label on node mariadb == 1
+# DOMAIN var and domain for adminer created
 version: '3.8'
 
 volumes:
-  mdb_data:
+  data:
+secrets:
+  - mariadb-root-password:
+      external: true
+
 networks:
   mariadb-public:
     external: true
@@ -18,7 +24,6 @@ services:
     deploy:
       placement:
         constraints:
-          - node.role == worker
           - node.labels.mariadb == 1
       resources:
         limits:
@@ -28,13 +33,34 @@ services:
           cpus: '0.25'
           memory: 300M
     volumes:
-      - mdb_data:/var/lib/mysql
-      - "./sda:/home"
+      - data:/var/lib/mysql
+        #      - "./sda:/home"
     networks:
-      - mariadb-public
-  panel:
+      - mariadb-public:
+          external: true
+      - traefik-public:
+          external: true
+  adminer:
     image: adminer:4.8.0-standalone
+    deploy:
+      placement:
+        constraints:
+          - node.labels.mariadb == 1
+        labels:
+          - traefik.enable=true
+          - traefik.docker.network=traefik-public
+          - traefik.constraint-label=traefik-public
+          # http router
+          - traefik.http.routers.adminer-http.rule=Host(`${DOMAIN}`)
+          - traefik.http.routers.adminer-http.entrypoints=http
+          - traefik.http.routers.adminer-http.middleware=https-redirect
+          #https router
+          - traefik.http.routers.adminer-https.rule=Host(`${DOMAIN}`)
+          - traefik.http.routers.adminer-https.entrypoints=https
+          - traefik.http.routers.adminer-https.tls=true
+          - traefik.http.routers.adminer-https.tls.certresolver=le
     networks:
+      - traefik-public
       - mariadb-public
 
 
