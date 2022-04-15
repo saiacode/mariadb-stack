@@ -14,8 +14,10 @@ secrets:
       external: true
 
 networks:
-  mariadb-public:
-    external: true
+  - mariadb-public:
+      external: true
+  - traefik-public:
+      external: true
 services:
   mariadb:
     image: mariadb:10.5.8-focal
@@ -36,10 +38,8 @@ services:
       - data:/var/lib/mysql
         #      - "./sda:/home"
     networks:
-      - mariadb-public:
-          external: true
-      - traefik-public:
-          external: true
+      - mariadb-public
+      - traefik-public
   adminer:
     image: adminer:4.8.0-standalone
     deploy:
