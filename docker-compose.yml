@@ -42,7 +42,7 @@ services:
       - data:/var/lib/mysql
         #      - "./sda:/home"
     ports:
-      - 57840:3306
+      - ${PORT}:3306
     networks:
       - mariadb-public
       - traefik-public
