@@ -1,9 +1,6 @@
 # MariaDB 
 # Single Node
-# Requires
-# Net mariadb-public
-# Secret mariadb-root-password
-# Label on node mariadb == 1
+
 version: '3.8'
 
 volumes:
@@ -12,16 +9,19 @@ volumes:
 secrets:
   mariadb-root-password:
     external: true
+    name: ${MARIADB_ROOT_PASSWORD}
 
 networks:
-  mariadb-public:
+  public:
     external: true
-  traefik-public:
+    name: ${MARIADB_PUBLIC_NETWORK}
+  ingress:
     external: true
+    name: ${MARIADB_INGRESS_NETWORK}
       
 services:
   mariadb:
-    image: mariadb:10.5.8-focal
+    image: ${MARIADB_IMAGE}
     secrets:
       - mariadb-root-password
     environment:
@@ -29,21 +29,20 @@ services:
     deploy:
       placement:
         constraints:
-          - node.labels.mariadb == 1
+          - node.labels.${NODE_LABEL} == 1
       resources:
         limits:
-          cpus: '0.99'
-          memory: 900M
+          cpus: ${MARIADB_CPU_LIMIT}
+          memory: ${MARIADB_MEMORY_LIMIT}
         reservations:
-          cpus: '0.25'
-          memory: 300M
+          cpus: ${MARIADB_CPU_RESERVATION}
+          memory: ${MARIADB_MEMORY_RESERVATION}
     volumes:
       - data:/var/lib/mysql
-        #      - "./sda:/home"
     ports:
-      - ${PORT}:3306
+      - ${MARIADB_PORT}:3306
     networks:
-      - mariadb-public
-      - traefik-public
+      - public
+      - ingress
 
 
