@@ -15,9 +15,6 @@ networks:
   public:
     external: true
     name: ${MARIADB_PUBLIC_NETWORK}
-  ingress:
-    external: true
-    name: ${MARIADB_INGRESS_NETWORK}
       
 services:
   mariadb:
@@ -43,6 +40,4 @@ services:
       - ${MARIADB_PORT}:3306
     networks:
       - public
-      - ingress
-
 
