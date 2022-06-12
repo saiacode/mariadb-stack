@@ -1,1 +1,4 @@
 portainer.sh
+.gitignore
+*.env
+
